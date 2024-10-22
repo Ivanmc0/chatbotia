@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Chatbot IA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .chat-container {
+            width: 40%;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .chat-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #chat-box {
+            height: 300px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .user-message {
+            background-color: #cce5ff;
+            text-align: right;
+        }
+
+        .bot-message {
+            background-color: #d4edda;
+        }
+
+        #consulta {
+            width: 80%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        #enviar-btn {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #enviar-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img clas="img-logo" src="ia.png" alt="ia">
+            </div>
+            <nav class="navbar">
+                <ul>
+                    <li><a href="#home">Inicio</a></li>
+                    <!-- <li><a href="#about">Acerca de</a></li>
+                    <li><a href="#services">Servicios</a></li>
+                    <li><a href="#contact">Contacto</a></li> -->
+                </ul>
+            </nav>
+            <div class="cta">
+                <button>¡Contáctanos!</button>
+            </div>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="image-container">
+        <img src="image.jpg" alt="ia" class="responsive-image">
+    </div>
+
+    <div class="chat-container">
+        <h2 class="chat-title">Chatbot Inteligencia Artificial</h2>
+        <div id="chat-box"></div>
+        <div>
+            <input type="text" id="consulta" placeholder="Escribe tu pregunta..." />
+            <button id="enviar-btn">Enviar</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const consultaInput = document.getElementById('consulta');
+        const enviarBtn = document.getElementById('enviar-btn');
+
+        // Función para enviar consulta al chatbot
+        async function enviarConsulta() {
+            const consulta = consultaInput.value.trim();
+
+            if (!consulta) return;  // Evitar enviar consultas vacías
+
+            // Añadir mensaje del usuario en el chat
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chat-message user-message';
+            userMessage.textContent = consulta;
+            chatBox.appendChild(userMessage);
+
+            try {
+                const response = await fetch('https://735b-34-23-32-231.ngrok-free.app/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 'consulta': consulta }),
+                });
+
+                const data = await response.json();
+
+                // Mostrar la respuesta del chatbot
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chat-message bot-message';
+                botMessage.textContent = data.respuesta;
+                chatBox.appendChild(botMessage);
+
+                // Desplazar hacia abajo el chatbox para ver el nuevo mensaje
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Respuesta del servidor:", data);
+                } else {
+                    console.error("Error en la solicitud:", response.statusText);
+                }
+            } catch (error) {
+                console.error('Error al comunicarse con el chatbot:', error);
+            }
+
+            consultaInput.value = '';
+        }
+
+        enviarBtn.addEventListener('click', enviarConsulta);
+
+        consultaInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                enviarConsulta();
+            }
+        });
+    </script>
+</body>
+
+</html>
